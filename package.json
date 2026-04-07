@@ -1,5 +1,5 @@
 {
-	"name": "kirby-translation-status",
+	"name": "kirby-translation-progress",
 	"scripts": {
 		"dev": "kirbyup src/index.js --watch",
 		"build": "kirbyup src/index.js"

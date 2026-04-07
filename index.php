@@ -5,7 +5,7 @@ use Kirby\Cms\App as Kirby;
 require_once __DIR__ . '/classes/FieldAdapters.php';
 require_once __DIR__ . '/classes/TranslationStatus.php';
 
-Kirby::plugin('medienbaecker/translation-status', [
+Kirby::plugin('medienbaecker/translation-progress', [
 	'options' => [
 		'minValueLength'    => 50,
 		'adapters'         => [],
@@ -16,33 +16,33 @@ Kirby::plugin('medienbaecker/translation-status', [
 	],
 	'translations' => [
 		'en' => [
-			'translation-status.title'        => 'Translation Status',
-			'translation-status.complete'      => 'Complete',
-			'translation-status.partial'       => 'Partial',
-			'translation-status.untranslated'  => 'Untranslated',
-			'translation-status.missing'       => 'Missing',
-			'translation-status.variables'     => 'Language Variables',
-			'translation-status.last-modified' => 'Last edit:',
+			'translation-progress.title'        => 'Progress',
+			'translation-progress.complete'      => 'Complete',
+			'translation-progress.partial'       => 'Partial',
+			'translation-progress.untranslated'  => 'Untranslated',
+			'translation-progress.missing'       => 'Missing',
+			'translation-progress.variables'     => 'Language Variables',
+			'translation-progress.last-modified' => 'Last edit:',
 		],
 		'de' => [
-			'translation-status.title'        => 'Übersetzungsstatus',
-			'translation-status.complete'      => 'Vollständig',
-			'translation-status.partial'       => 'Teilweise',
-			'translation-status.untranslated'  => 'Nicht übersetzt',
-			'translation-status.missing'       => 'Fehlt',
-			'translation-status.variables'     => 'Sprachvariablen',
-			'translation-status.last-modified' => 'Letzte Änderung:',
+			'translation-progress.title'        => 'Fortschritt',
+			'translation-progress.complete'      => 'Vollständig',
+			'translation-progress.partial'       => 'Teilweise',
+			'translation-progress.untranslated'  => 'Nicht übersetzt',
+			'translation-progress.missing'       => 'Fehlt',
+			'translation-progress.variables'     => 'Sprachvariablen',
+			'translation-progress.last-modified' => 'Letzte Änderung:',
 		],
 	],
 	'api' => [
 		'routes' => [
 			[
-				'pattern' => 'translation-status/overview',
+				'pattern' => 'translation-progress/overview',
 				'method'  => 'GET',
 				'action'  => function () {
 					FieldAdapters::registerDefaults();
 
-					$custom = option('medienbaecker.translation-status.adapters', []);
+					$custom = option('medienbaecker.translation-progress.adapters', []);
 					foreach ($custom as $type => $adapter) {
 						FieldAdapters::register($type, $adapter);
 					}

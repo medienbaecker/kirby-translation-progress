@@ -23,7 +23,7 @@ class TranslationStatus
 		$template = $page->intendedTemplate()->name();
 		if (!isset(self::$fieldCache[$template])) {
 			$form = \Kirby\Form\Form::for($page);
-			$ignoreTypes = option('medienbaecker.translation-status.ignoreFieldTypes', []);
+			$ignoreTypes = option('medienbaecker.translation-progress.ignoreFieldTypes', []);
 			$fields = [];
 
 			foreach ($form->fields() as $name => $field) {
@@ -82,7 +82,7 @@ class TranslationStatus
 		if ($defaultText !== $langText) return true;
 
 		// Short identical values are likely loan words or proper nouns
-		$minLength = option('medienbaecker.translation-status.minValueLength', 50);
+		$minLength = option('medienbaecker.translation-progress.minValueLength', 50);
 		return mb_strlen($langText) < $minLength;
 	}
 
@@ -200,11 +200,11 @@ class TranslationStatus
 		$tree = self::buildTree($kirby->site(), $defaultLang, $secondaryLangs, $lastModified);
 
 		// Language variables node
-		if (option('medienbaecker.translation-status.languageVariables', true)) {
+		if (option('medienbaecker.translation-progress.languageVariables', true)) {
 			$defaultTranslations = $kirby->defaultLanguage()->translations();
 			$variablesNode = [
 				'id'    => '_variables',
-				'title' => t('translation-status.variables', 'Language Variables'),
+				'title' => t('translation-progress.variables', 'Language Variables'),
 				'icon'  => 'translate',
 				'link'  => 'languages/' . $defaultLang,
 				'langs' => [],

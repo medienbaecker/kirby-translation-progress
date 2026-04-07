@@ -1,5 +1,5 @@
 {
-    "name": "medienbaecker/kirby-translation-status",
+    "name": "medienbaecker/kirby-translation-progress",
     "description": "Translation status overview for the Kirby Panel",
     "type": "kirby-plugin",
     "license": "MIT",

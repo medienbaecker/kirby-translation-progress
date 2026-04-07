@@ -1,20 +1,20 @@
-# Kirby Translation Status
+# Kirby Translation Progress
 
 Adds a translation overview to the Panel's Languages view: a percentage per language and a page tree showing the translation progress for every page.
 
-![The Languages view with a Translation Status section showing per-language percentages and a page tree with translation progress per page and language](.github/screenshot.png)
+![The Languages view with a Translation Progress section showing per-language percentages and a page tree with translation progress per page and language](.github/screenshot.png)
 
 ## Installation
 
 ### Composer
 
 ```bash
-composer require medienbaecker/kirby-translation-status
+composer require medienbaecker/kirby-translation-progress
 ```
 
 ### Manual
 
-Download and extract to `site/plugins/kirby-translation-status`.
+Download and extract to `site/plugins/kirby-translation-progress`.
 
 ## Requirements
 
@@ -57,7 +57,7 @@ The `translations` array from your language files is also compared, shown as a s
 ## Options
 
 ```php
-'medienbaecker.translation-status' => [
+'medienbaecker.translation-progress' => [
     'minValueLength'    => 50,
     'languageVariables' => true,
     'ignoreFieldTypes'  => ['files', 'pages', 'users'],
@@ -79,7 +79,7 @@ fields:
 For third-party field types that store text in a custom format, register an adapter that returns plain text:
 
 ```php
-'medienbaecker.translation-status' => [
+'medienbaecker.translation-progress' => [
     'adapters' => [
         'my-field' => function (string $value): string {
             $data = json_decode($value, true);

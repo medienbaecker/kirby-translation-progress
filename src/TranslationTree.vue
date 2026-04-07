@@ -145,12 +145,12 @@ export default {
 		},
 		langTitle(node, langCode) {
 			const info = node.langs?.[langCode];
-			if (!info) return this.$t("translation-status.missing");
+			if (!info) return this.$t("translation-progress.missing");
 			const labels = {
-				complete: this.$t("translation-status.complete"),
+				complete: this.$t("translation-progress.complete"),
 				partial: `${info.translated}/${info.total}`,
-				untranslated: this.$t("translation-status.untranslated"),
-				missing: this.$t("translation-status.missing"),
+				untranslated: this.$t("translation-progress.untranslated"),
+				missing: this.$t("translation-progress.missing"),
 			};
 			return labels[info.status] || info.status;
 		},

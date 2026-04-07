@@ -39,13 +39,13 @@
 		</template>
 
 		<template v-if="translationTree && translationTree.length">
-			<k-section class="translation-status-section" :headline="$t('translation-status.title')">
+			<k-section class="translation-progress-section" :headline="$t('translation-progress.title')">
 				<k-stats size="medium" :reports="statsReports" />
 			</k-section>
 
 			<k-section>
-				<div class="translation-status-tree-container" @mouseleave="hoveredLang = null">
-					<div class="translation-status-tree-inner">
+				<div class="translation-progress-tree-container" @mouseleave="hoveredLang = null">
+					<div class="translation-progress-tree-inner">
 					<div class="translation-tree-header">
 						<span class="translation-tree-header__pages" @mouseenter="hoveredLang = null">{{ $t("page") }}</span>
 						<div class="translation-tree-header__percentages">
@@ -101,7 +101,7 @@ export default {
 				const modified = this.translationLastModified[lang.code];
 
 				let info = modified
-					? this.$t("translation-status.last-modified") + " " + new Date(modified).toLocaleDateString(this.$panel.translation.code, { year: "numeric", month: "short", day: "numeric" })
+					? this.$t("translation-progress.last-modified") + " " + new Date(modified).toLocaleDateString(this.$panel.translation.code, { year: "numeric", month: "short", day: "numeric" })
 					: "";
 
 				return {
@@ -116,7 +116,7 @@ export default {
 	methods: {
 		async loadTranslationStatus() {
 			try {
-				const data = await this.$api.get("translation-status/overview");
+				const data = await this.$api.get("translation-progress/overview");
 				this.translationTree = data.tree;
 				this.translationLanguages = data.languages;
 				this.translationDefaultLanguage = data.defaultLanguage;
@@ -131,18 +131,18 @@ export default {
 </script>
 
 <style>
-.translation-status-section {
+.translation-progress-section {
 	margin-block-start: var(--spacing-12);
 }
 
-.translation-status-tree-container {
+.translation-progress-tree-container {
 	background: var(--input-color-back);
 	border-radius: var(--rounded);
 	box-shadow: var(--shadow);
 	overflow-x: auto;
 }
 
-.translation-status-tree-inner {
+.translation-progress-tree-inner {
 	min-width: 100%;
 	width: max-content;
 }
