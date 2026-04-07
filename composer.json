@@ -1,0 +1,35 @@
+{
+    "name": "medienbaecker/kirby-translation-status",
+    "description": "Translation status overview for the Kirby Panel",
+    "type": "kirby-plugin",
+    "license": "MIT",
+    "keywords": ["kirby", "kirby-plugin", "translation", "i18n", "panel", "multilanguage"],
+    "authors": [
+        {
+            "name": "Thomas Günther",
+            "homepage": "https://medienbaecker.com"
+        }
+    ],
+    "require": {
+        "php": "^8.2",
+        "getkirby/composer-installer": "^1.2"
+    },
+    "config": {
+        "allow-plugins": {
+            "getkirby/composer-installer": true
+        }
+    },
+    "archive": {
+        "exclude": [
+            "src/",
+            "node_modules/",
+            "vendor/",
+            ".DS_Store",
+            ".gitattributes",
+            ".gitignore",
+            "composer.lock",
+            "package.json",
+            "package-lock.json"
+        ]
+    }
+}
