@@ -11,6 +11,7 @@ Kirby::plugin('medienbaecker/translation-progress', [
 		'adapters'         => [],
 		'ignoreFieldTypes' => [
 			'files', 'pages', 'users',
+			'link', 'color', 'date', 'time',
 		],
 		'languageVariables' => true,
 	],

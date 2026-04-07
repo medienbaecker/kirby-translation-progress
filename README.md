@@ -36,7 +36,7 @@ The plugin uses a length heuristic: identical values shorter than `minValueLengt
 
 ### Field types
 
-The plugin reads the blueprint to find translatable fields. Fields with `translate: false` are excluded, and so are reference types (`files`, `pages`, `users`) that store UUIDs instead of text.
+The plugin reads the blueprint to find translatable fields. Fields with `translate: false` are excluded, and so are non-text types (`files`, `pages`, `users`, `link`, `color`, `date`, `time`) that don't contain translatable content.
 
 For complex fields, the plugin extracts text before comparing:
 
@@ -60,7 +60,7 @@ The `translations` array from your language files is also compared, shown as a s
 'medienbaecker.translation-progress' => [
     'minValueLength'    => 50,
     'languageVariables' => true,
-    'ignoreFieldTypes'  => ['files', 'pages', 'users'],
+    'ignoreFieldTypes'  => ['files', 'pages', 'users', 'link', 'color', 'date', 'time'],
     'adapters'          => [],
 ],
 ```
