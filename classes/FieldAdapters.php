@@ -38,7 +38,7 @@ class FieldAdapters
 			foreach ($blocks as $block) {
 				foreach (($block['content'] ?? []) as $key => $val) {
 					if (is_string($val) && $key !== 'id') {
-						$text .= strip_tags($val) . ' ';
+						$text .= FieldAdapters::extractNestedText($val) . ' ';
 					}
 				}
 			}
@@ -56,7 +56,7 @@ class FieldAdapters
 					foreach ($col['blocks'] ?? [] as $block) {
 						foreach (($block['content'] ?? []) as $key => $val) {
 							if (is_string($val) && $key !== 'id') {
-								$text .= strip_tags($val) . ' ';
+								$text .= FieldAdapters::extractNestedText($val) . ' ';
 							}
 						}
 					}
@@ -78,7 +78,7 @@ class FieldAdapters
 			foreach ($rows as $row) {
 				if (!is_array($row)) continue;
 				foreach ($row as $val) {
-					if (is_string($val)) $text .= strip_tags($val) . ' ';
+					if (is_string($val)) $text .= FieldAdapters::extractNestedText($val) . ' ';
 				}
 			}
 			return trim($text);
@@ -95,7 +95,7 @@ class FieldAdapters
 
 			$text = '';
 			foreach ($data as $val) {
-				if (is_string($val)) $text .= strip_tags($val) . ' ';
+				if (is_string($val)) $text .= FieldAdapters::extractNestedText($val) . ' ';
 			}
 			return trim($text);
 		});
@@ -118,6 +118,46 @@ class FieldAdapters
 			$text .= static::extractTiptapText($child);
 		}
 		return $text;
+	}
+
+	/**
+	 * Extract text from a string value that may contain structured content.
+	 * Detects tiptap JSON, HTML, blocks JSON, and layout JSON.
+	 */
+	public static function extractNestedText(string $value): string
+	{
+		$trimmed = ltrim($value);
+
+		// JSON object — likely tiptap
+		if (str_starts_with($trimmed, '{')) {
+			$data = json_decode($value, true);
+			if (is_array($data) && ($data['type'] ?? null) === 'doc') {
+				return trim(static::extractTiptapText($data));
+			}
+		}
+
+		// JSON array — likely blocks or layout
+		if (str_starts_with($trimmed, '[')) {
+			$data = json_decode($value, true);
+			if (is_array($data) && !empty($data)) {
+				$first = $data[0] ?? null;
+				if (is_array($first)) {
+					if (isset($first['columns'])) {
+						return static::extractText('layout', $value);
+					}
+					if (isset($first['type'], $first['content'])) {
+						return static::extractText('blocks', $value);
+					}
+				}
+			}
+		}
+
+		// HTML
+		if (str_contains($value, '<') && $value !== strip_tags($value)) {
+			return strip_tags($value);
+		}
+
+		return $value;
 	}
 
 	/** @internal */
