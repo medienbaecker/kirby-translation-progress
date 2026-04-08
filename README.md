@@ -46,8 +46,8 @@ For complex fields, the plugin extracts text before comparing:
 | `writer`, `list`   | HTML with tags stripped               |
 | `blocks`           | Text from each block's content fields |
 | `layout`           | Text from blocks inside each column   |
-| `structure`        | String values from each row           |
-| `object`           | String values                         |
+| `structure`        | Each sub-field per row, individually  |
+| `object`           | Each sub-field individually           |
 | `tiptap`           | Text nodes from ProseMirror JSON      |
 
 ### Language variables
@@ -94,7 +94,8 @@ Built-in adapters cover `writer`, `list`, `blocks`, `layout`, `structure`, `obje
 ## Limitations
 
 - The plugin can't know if identical content was intentional. The `minValueLength` threshold is a best guess.
-- Complex fields (blocks, layouts, structures, objects) count as one field. If any part changed, the whole field is "translated". The plugin doesn't count individual blocks or structure rows.
+- Blocks and layouts count as one field. The plugin doesn't track individual blocks across languages since they can be reordered, added, or removed independently.
+- Object and structure fields are expanded into their sub-fields using the blueprint. Non-translatable sub-field types (like `link`) are skipped, and each translatable sub-field counts individually. Nested compounds (e.g. a structure inside an object) are expanded recursively.
 
 ## License
 
