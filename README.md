@@ -1,6 +1,6 @@
 # Kirby Translation Progress
 
-Adds a translation overview to the Panel's Languages view: a percentage per language and a page tree showing the translation progress for every page.
+Extends the Panel's Languages view with a translation overview: a completion percentage per language and a collapsible page tree showing per-page progress.
 
 ![The Languages view with a Translation Progress section showing per-language percentages and a page tree with translation progress per page and language](.github/screenshot.png)
 
@@ -26,7 +26,7 @@ Download and extract to `site/plugins/kirby-translation-progress`.
 
 The plugin reads Kirby's content files, compares them field by field against the default language, and reports a percentage.
 
-A field is considered **translated** when its content differs from the default language. A field that's **empty** in the translation counts as untranslated. A field that's **identical** to the default language is where it gets tricky:
+Pages _without_ a content file for a language are marked as **missing**. A field is considered **translated** when its content differs from the default language. A field that's empty in the translation counts as **untranslated**. A field that's identical to the default language is where it gets tricky:
 
 ### Identical content
 
@@ -50,6 +50,8 @@ For complex fields, the plugin extracts text before comparing:
 | `object`           | Each sub-field individually           |
 | `tiptap`           | Text nodes from ProseMirror JSON      |
 
+Object and structure fields are expanded recursively, nested compounds (e.g. a structure inside an object) should work too.
+
 ### Language variables
 
 The `translations` array from your language files is also compared, shown as a separate row. Disable it with `languageVariables: false`.
@@ -65,14 +67,15 @@ The `translations` array from your language files is also compared, shown as a s
 ],
 ```
 
-Important: use Kirby's built-in `translate: false` option in your blueprints to exclude specific fields:
-
-```yaml
-fields:
-  category:
-    type: select
-    translate: false
-```
+> [!TIP]
+> Use Kirby's built-in `translate: false` option in your blueprints to exclude specific fields from secondary languages:
+>
+> ```yaml
+> fields:
+>   category:
+>     type: select
+>     translate: false
+> ```
 
 ## Custom adapters
 
@@ -95,8 +98,7 @@ Built-in adapters cover `writer`, `list`, `blocks`, `layout`, `structure`, `obje
 
 - The plugin can't know if identical content was intentional. The `minValueLength` threshold is a best guess.
 - Blocks and layouts count as one field. The plugin doesn't track individual blocks across languages since they can be reordered, added, or removed independently.
-- Object and structure fields are expanded into their sub-fields using the blueprint. Non-translatable sub-field types (like `link`) are skipped, and each translatable sub-field counts individually. Nested compounds (e.g. a structure inside an object) are expanded recursively.
 
 ## License
 
-MIT
+[MIT](./LICENSE)
