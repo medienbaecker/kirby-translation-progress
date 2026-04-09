@@ -276,7 +276,7 @@ class TranslationStatus
 
 			$node = [
 				'id'     => $page->id(),
-				'title'  => $page->content($defaultLang)->get('title')->value(),
+				'title'  => $page->title()->value(),
 				'link'   => $page->panel()->path(),
 				'status' => $page->status(),
 			];
@@ -309,7 +309,12 @@ class TranslationStatus
 		}
 
 		$lastModified = [];
+
+		// Switch to default language so title() resolves correctly
+		$previousLang = $kirby->language()?->code();
+		$kirby->setCurrentLanguage($defaultLang);
 		$tree = self::buildTree($kirby->site(), $defaultLang, $secondaryLangs, $lastModified);
+		$kirby->setCurrentLanguage($previousLang);
 
 		// Language variables node
 		if (option('medienbaecker.translation-progress.languageVariables', true)) {
