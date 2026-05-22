@@ -22,7 +22,13 @@ class TranslationStatus
 	{
 		$template = $page->intendedTemplate()->name();
 		if (!isset(self::$fieldCache[$template])) {
-			$form = \Kirby\Form\Form::for($page);
+			// Form::for() would also fill the stored content, which throws
+			// when legacy or migrated content no longer matches the current
+			// field definitions. Only the field definitions are needed here.
+			$form = new \Kirby\Form\Form(
+				fields: $page->blueprint()->fields(),
+				model:  $page
+			);
 			$ignoreTypes = option('medienbaecker.translation-progress.ignoreFieldTypes', []);
 			$fields = [];
 
@@ -255,41 +261,45 @@ class TranslationStatus
 		$listed = $parent->children()->listed()->sortBy('num', 'asc');
 		$rest = $parent->children()->unlisted()->add($parent->drafts());
 		foreach ($listed->add($rest) as $page) {
-			$langs = self::pageStatus($page, $defaultLang, $secondaryLangs);
-			$children = self::buildTree($page, $defaultLang, $secondaryLangs, $lastModified);
+			try {
+				$langs = self::pageStatus($page, $defaultLang, $secondaryLangs);
+				$children = self::buildTree($page, $defaultLang, $secondaryLangs, $lastModified);
 
-			foreach ($secondaryLangs as $langCode) {
-				if ($page->translation($langCode)->exists()) {
-					try {
-						$modified = $page->version('latest')->modified($langCode);
-						if ($modified && (!isset($lastModified[$langCode]) || $modified > $lastModified[$langCode])) {
-							$lastModified[$langCode] = $modified;
-						}
-					} catch (\Throwable $e) {}
+				foreach ($secondaryLangs as $langCode) {
+					if ($page->translation($langCode)->exists()) {
+						try {
+							$modified = $page->version('latest')->modified($langCode);
+							if ($modified && (!isset($lastModified[$langCode]) || $modified > $lastModified[$langCode])) {
+								$lastModified[$langCode] = $modified;
+							}
+						} catch (\Throwable $e) {}
+					}
 				}
-			}
 
-			// Include node if it has translatable fields OR children with translatable fields
-			if ($langs === null && empty($children)) {
+				// Include node if it has translatable fields OR children with translatable fields
+				if ($langs === null && empty($children)) {
+					continue;
+				}
+
+				$node = [
+					'id'     => $page->id(),
+					'title'  => $page->title()->value(),
+					'link'   => $page->panel()->path(),
+					'status' => $page->status(),
+				];
+
+				if ($langs !== null) {
+					$node['langs'] = $langs;
+				}
+
+				if (!empty($children)) {
+					$node['children'] = $children;
+				}
+
+				$nodes[] = $node;
+			} catch (\Throwable $e) {
 				continue;
 			}
-
-			$node = [
-				'id'     => $page->id(),
-				'title'  => $page->title()->value(),
-				'link'   => $page->panel()->path(),
-				'status' => $page->status(),
-			];
-
-			if ($langs !== null) {
-				$node['langs'] = $langs;
-			}
-
-			if (!empty($children)) {
-				$node['children'] = $children;
-			}
-
-			$nodes[] = $node;
 		}
 
 		return $nodes;
@@ -298,8 +308,18 @@ class TranslationStatus
 	public static function overview(): array
 	{
 		$kirby = kirby();
-		$defaultLang = $kirby->defaultLanguage()->code();
+		$defaultLang = $kirby->defaultLanguage()?->code();
 		$secondaryLangs = self::secondaryLanguageCodes();
+
+		if ($defaultLang === null) {
+			return [
+				'tree'            => [],
+				'languages'       => [],
+				'defaultLanguage' => null,
+				'totals'          => [],
+				'lastModified'    => [],
+			];
+		}
 
 		$languages = [];
 		foreach ($kirby->languages() as $lang) {
