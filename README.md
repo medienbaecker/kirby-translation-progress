@@ -63,6 +63,9 @@ The `translations` array from your language files is also compared, shown as a s
     'minValueLength'    => 50,
     'languageVariables' => true,
     'ignoreFieldTypes'  => ['files', 'pages', 'users', 'link', 'color', 'date', 'time'],
+    'ignoreVariable'    => null,
+    'ignoreField'       => null,
+    'ignorePage'        => null,
     'adapters'          => [],
 ],
 ```
@@ -77,7 +80,32 @@ The `translations` array from your language files is also compared, shown as a s
 >     translate: false
 > ```
 
-## Custom adapters
+### Ignoring content
+
+Some content keeps a language from ever reaching 100% even when nothing's wrong: a language variable that happens to read the same as the default in most languages (a unit or shared term like `{{time}} min`), a field that doesn't need translating, or an entire page type. Three callbacks exclude it from the calculation, each returning `true` to exclude:
+
+```php
+'medienbaecker.translation-progress' => [
+    // Language variables, by translation key
+    'ignoreVariable' => function (string $key, string $value): bool {
+        return $key === 'recipe.time';
+    },
+
+    // Content fields, by name and template
+    'ignoreField' => function (string $name, string $template): bool {
+        return $template === 'recipe' && $name === 'duration';
+    },
+
+    // Whole pages, by template or anything on the Page object
+    'ignorePage' => function (\Kirby\Cms\Page $page): bool {
+        return $page->intendedTemplate()->name() === 'recipe';
+    },
+],
+```
+
+`ignoreField` runs once per template and only sees top-level fields, so sub-fields of `object` and `structure` fields follow `ignoreFieldTypes` instead. It also receives the field's blueprint `type` as an optional third argument, which scopes a type to one template (`ignoreFieldTypes` drops it everywhere). `ignorePage` skips a page's own progress but still descends into its children, so a parent kept only to hold translatable children stays in the tree.
+
+### Custom adapters
 
 For third-party field types that store text in a custom format, register an adapter that returns plain text:
 

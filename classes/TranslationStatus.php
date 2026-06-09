@@ -30,6 +30,7 @@ class TranslationStatus
 				model:  $page
 			);
 			$ignoreTypes = option('medienbaecker.translation-progress.ignoreFieldTypes', []);
+			$ignoreField = option('medienbaecker.translation-progress.ignoreField');
 			$fields = [];
 
 			foreach ($form->fields() as $name => $field) {
@@ -37,6 +38,7 @@ class TranslationStatus
 
 				$type = $field->type();
 				if (in_array($type, $ignoreTypes)) continue;
+				if (is_callable($ignoreField) && $ignoreField($name, $template, $type) === true) continue;
 
 				$info = [
 					'translate' => $field->translate(),
@@ -257,22 +259,26 @@ class TranslationStatus
 	protected static function buildTree($parent, string $defaultLang, array $secondaryLangs, array &$lastModified = []): array
 	{
 		$nodes = [];
+		$ignorePage = option('medienbaecker.translation-progress.ignorePage');
 
 		$listed = $parent->children()->listed()->sortBy('num', 'asc');
 		$rest = $parent->children()->unlisted()->add($parent->drafts());
 		foreach ($listed->add($rest) as $page) {
 			try {
-				$langs = self::pageStatus($page, $defaultLang, $secondaryLangs);
+				$ignored = is_callable($ignorePage) && $ignorePage($page) === true;
+				$langs = $ignored ? null : self::pageStatus($page, $defaultLang, $secondaryLangs);
 				$children = self::buildTree($page, $defaultLang, $secondaryLangs, $lastModified);
 
-				foreach ($secondaryLangs as $langCode) {
-					if ($page->translation($langCode)->exists()) {
-						try {
-							$modified = $page->version('latest')->modified($langCode);
-							if ($modified && (!isset($lastModified[$langCode]) || $modified > $lastModified[$langCode])) {
-								$lastModified[$langCode] = $modified;
-							}
-						} catch (\Throwable $e) {}
+				if (!$ignored) {
+					foreach ($secondaryLangs as $langCode) {
+						if ($page->translation($langCode)->exists()) {
+							try {
+								$modified = $page->version('latest')->modified($langCode);
+								if ($modified && (!isset($lastModified[$langCode]) || $modified > $lastModified[$langCode])) {
+									$lastModified[$langCode] = $modified;
+								}
+							} catch (\Throwable $e) {}
+						}
 					}
 				}
 
@@ -339,6 +345,16 @@ class TranslationStatus
 		// Language variables node
 		if (option('medienbaecker.translation-progress.languageVariables', true)) {
 			$defaultTranslations = $kirby->defaultLanguage()->translations();
+
+			$ignoreVariable = option('medienbaecker.translation-progress.ignoreVariable');
+			if (is_callable($ignoreVariable)) {
+				$defaultTranslations = array_filter(
+					$defaultTranslations,
+					fn ($value, $key) => $ignoreVariable($key, $value) !== true,
+					ARRAY_FILTER_USE_BOTH
+				);
+			}
+
 			$variablesNode = [
 				'id'    => '_variables',
 				'title' => t('translation-progress.variables', 'Language Variables'),
