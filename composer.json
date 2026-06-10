@@ -2,6 +2,7 @@
     "name": "medienbaecker/kirby-translation-progress",
     "description": "Translation status overview for the Kirby Panel",
     "type": "kirby-plugin",
+    "version": "1.2.1",
     "license": "MIT",
     "keywords": ["kirby", "kirby-plugin", "translation", "i18n", "panel", "multilanguage"],
     "authors": [
